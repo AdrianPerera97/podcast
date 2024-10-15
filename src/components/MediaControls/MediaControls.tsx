@@ -1,63 +1,58 @@
 import styles from "./MediaControls.module.css";
+import { SongContext } from "../../contexts/PlaybackProvider";
+import { useContext } from "react";
 
-type audioTypes = {
-  id: number;
-  title: string;
-  description: string;
-  user: {
-    urls: {
-      profile_image: {
-        original: string;
-      };
-    };
-  };
-  channel: {
-    urls: {
-      logo_image: {
-        original: string;
-      };
-    };
-  };
-  duration: number;
-  urls: {
-    high_mp3: string;
-  };
-};
+export default function MediaControls() {
+  const songContext = useContext(SongContext);
 
-type Props = {
-  currentSong: audioTypes | null;
-  isPlaying: boolean;
-  onPlayPause: () => void;
-};
-
-export default function MediaControls(props: Props) {
   function convertAudioTime(time: number) {
-    const minutes = Math.floor(time / 60);
-    const remainingSeconds = Math.floor(time % 60);
-    return `${minutes}:${remainingSeconds}`;
+    const hours = Math.floor(time / 3600);
+    const minutes = Math.floor((time % 3600) / 60);
+    const seconds = Math.floor(time % 60);
+
+    if (hours > 0) {
+      return `${hours}:${String(minutes).padStart(2, "0")}:${String(
+        seconds
+      ).padStart(2, "0")}`;
+    } else {
+      return `${minutes}:${String(seconds).padStart(2, "0")}`;
+    }
   }
 
   return (
     <div className={styles.media_container}>
-      <button id="previous_button">
-        <img src="/src/assets/static/svgs/skip_previous.svg" alt="previous" />
+      <button
+        id="previous_button"
+        onClick={songContext?.handlePreviousAudio}
+        title="Previous"
+      >
+        <img src="/assets/static/svgs/skip_previous.svg" alt="previous" />
       </button>
-      <button id="button_play" onClick={props.onPlayPause}>
+      <button
+        id="button_play"
+        onClick={songContext?.handlePlayPause}
+        title="Play/Pause"
+      >
         <img
           src={
-            props.isPlaying
-              ? "src/assets/static/svgs/pause.svg"
-              : "/src/assets/static/svgs/play_arrow.svg"
+            songContext?.isPlaying
+              ? "/assets/static/svgs/pause.svg"
+              : "/assets/static/svgs/play_arrow.svg"
           }
           alt="play/pause"
         />
       </button>
-      <button id="next_button">
-        <img src="/src/assets/static/svgs/skip_next.svg" alt="next" />
+      <button
+        id="next_button"
+        onClick={songContext?.handleNextAudio}
+        title="Next"
+      >
+        <img src="/assets/static/svgs/skip_next.svg" alt="next" />
       </button>
-      {props.currentSong?.duration && (
+      {songContext?.currentSong?.duration && (
         <span className={styles.media_time}>
-          0:00 / {convertAudioTime(props.currentSong.duration)}
+          {convertAudioTime(songContext?.elapsedTime)} /{" "}
+          {convertAudioTime(songContext?.currentSong.duration)}
         </span>
       )}
     </div>
