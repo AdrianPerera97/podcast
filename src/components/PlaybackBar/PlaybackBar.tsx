@@ -3,58 +3,28 @@ import MediaControls from "../MediaControls/MediaControls.tsx";
 import SongCard from "../SongCard/SongCard.tsx";
 import SoundFunction from "../SoundFunction/SoundFunction.tsx";
 import ProgressBar from "../ProgressBar/ProgressBar.tsx";
+import { SongContext } from "../../contexts/PlaybackProvider";
+import { useContext } from "react";
 
-type Props = {
-  currentSong: audioTypes | null;
-  isPlaying: boolean;
-  onPlayPause: () => void;
-};
+export default function PlaybackBar() {
+  const songContext = useContext(SongContext);
 
-type audioTypes = {
-  id: number;
-  title: string;
-  description: string;
-  user: {
-    urls: {
-      profile_image: {
-        original: string;
-      };
-    };
-  };
-  channel: {
-    urls: {
-      logo_image: {
-        original: string;
-      };
-    };
-  };
-  duration: number;
-  urls: {
-    high_mp3: string;
-  };
-};
-
-export default function PlaybackBar(props: Props) {
   return (
     <div className={styles.playBar_content}>
       <div className={styles.inner_container}>
         <ProgressBar />
-        <MediaControls
-          currentSong={props.currentSong}
-          isPlaying={props.isPlaying}
-          onPlayPause={props.onPlayPause}
-        />
-        {props.currentSong && (
+        <MediaControls />
+        {songContext?.currentSong && (
           <SongCard
-            id={props.currentSong.id}
+            id={songContext.currentSong.id}
             size="large"
-            primaryText={props.currentSong.title}
-            secondaryText={props.currentSong.description}
+            primaryText={songContext.currentSong.title}
+            secondaryText={songContext.currentSong.description}
             views={37000}
             likes={603}
-            imageUrl={props.currentSong.channel.urls.logo_image.original}
+            imageUrl={songContext.currentSong.channel.urls.logo_image.original}
             imageAlternative={
-              props.currentSong.user.urls.profile_image.original
+              songContext.currentSong.user.urls.profile_image.original
             }
           />
         )}
@@ -63,5 +33,3 @@ export default function PlaybackBar(props: Props) {
     </div>
   );
 }
-
-//TODO: Complete code and add new conditional rendering
